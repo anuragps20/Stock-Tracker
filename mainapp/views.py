@@ -1,8 +1,10 @@
+from asgiref.sync import sync_to_async
 from django.http.response import HttpResponse
 from django.shortcuts import render
 from yahoo_fin.stock_info import *
 from threading import Thread
 import queue
+from asgiref.sync import sync_to_async
 
 # Create your views here.
 def stockPicker(request):
@@ -15,8 +17,19 @@ def stockPicker(request):
     return render(request, 'mainapp/stockpicker.html', {'stockpicker': stock_picker})
 
 
+@sync_to_async
+def checkAuthenticated(request):
+    if not request.user.is_authenticated:
+        return False
+    else:
+        return True
+
+
 async def stockTracker(request):
-    print("Inside stocktracker")
+    is_loginned = await checkAuthenticated(request)
+    if not is_loginned:
+        return HttpResponse("Login First")
+    # print("Inside stocktracker")
     stockpicker = request.GET.getlist('stockpicker')
     data ={}
     available_stocks = tickers_nifty50()
