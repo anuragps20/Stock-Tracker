@@ -64,6 +64,29 @@
 </table>
 </div>
 </div>
+{{room_name|json_script:"room-name"}}
+<script>
+  const roomName = JSON.parse(document.getElementById('room-name').textContent);
+  var queryString = window.location.search;
+  queryString = queryString.substring(1);
+  {% comment %} console.log(queryString); {% endcomment %}
+  const stockSocket = new WebSocket(
+    'ws://' +
+    window.location.host +
+    '/ws/stock/' +
+    roomName +
+    '/' + 
+    '?' + 
+    queryString
+  );
+
+  stockSocket.onmessage = function(e) {
+    console.log("I'm In")
+    console.log(e.data);
+    const data = JSON.parse(e.data);
+    console.log(data);
+  };
+</script>
 {% endblock%} 
 {% block js%}
 <script></script>
